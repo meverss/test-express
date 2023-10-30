@@ -11,7 +11,7 @@ const infoCursos = {
       id: 2,
       titulo: 'Python Intermedio',
       lenguaje: 'python',
-      vistas: 13553,
+      vistas: 33553,
       nivel: 'intermedio'
     },
     {
