@@ -2,80 +2,35 @@ const express = require('express');
 const app = express();
 const PORT = process.env.port || 8080;
 
-const { infoCursos } = require('./cursos');
+
+
+//Routers
+
+const routerProgramacion = require('./routers/programacion.js');
+app.use('/api/cursos/programacion', routerProgramacion);
+
+const routerMatematicas = require('./routers/matematicas.js');
+app.use('/api/cursos/matematicas', routerMatematicas);
+
+// Middleware (Code that runs after every request and before every response)
+routerProgramacion.use(express.json());         //To be able to proccess request's body in JSON format
+routerMatematicas.use(express.json());
 
 // Routing
 app.get('/', (req, res) => {
-    res.send('My first Express Server. Cursos ')
+    // res.header('Cache-Control', 'max-age=7776000');
+    // res.header('Pragma', 'no-cache');
+    // res.header('Expires', '-1');
+
+    res.send('My first Express Server.');
 })
 
 app.get('/api/cursos', (req, res) => {
-    res.send(JSON.stringify(infoCursos));
-})
+    res.json(infoCursos);       // Method .json sends info in JSON format.
+});
 
-app.get('/api/cursos/programacion', (req, res) => {
-    res.send(JSON.stringify(infoCursos.programacion));
-})
 
-app.get('/api/cursos/matematicas', (req, res) => {
-    res.send(JSON.stringify(infoCursos.matematicas));
-})
 
-// Routing with parameters
-
-app.get('/api/cursos/programacion/:language', (req, res) => {
-    const language = req.params.language;
-    const results = infoCursos.programacion.filter(cursos => cursos.lenguaje === language);
-
-    function orderResults(order, param, value) {
-        const query = `req.query.${param}`;
-        const patternAsc = `b.${value} - a.${value}`;
-        const patternDesc = `a.${value} - b.${value}`;
-
-        switch (order) {
-            case "desc":
-                if (eval(query) === value) {
-                    return res.send(JSON.stringify(results.sort((a, b) => eval(patternAsc))));
-                }
-            case "asc":
-                if (query === value) {
-                    return res.send(JSON.stringify(results.sort((a, b) => eval(patternDesc))));
-                }
-            default:
-                res.send(JSON.stringify(results));
-        }
-    }
-
-    if (results.length === 0) {
-        res.send((404), `No curses of ${language} were found`);
-    }
-
-    orderResults('asc', 'order', 'vistas');
-
-})
-
-app.get('/api/cursos/matematicas/:theme', (req, res) => {
-    const theme = req.params.theme;
-    const results = infoCursos.matematicas.filter(cursos => cursos.tema === theme);
-
-    if (results.length === 0) {
-        res.send((404), `No curses of ${theme} were found`);
-    } else {
-        res.send(JSON.stringify(results));
-    }
-})
-
-app.get('/api/cursos/programacion/:language/:level', (req, res) => {
-    const language = req.params.language;
-    const level = req.params.level;
-    const results = infoCursos.programacion.filter(cursos => cursos.lenguaje === language && cursos.nivel === level);
-
-    if (results.length === 0) {
-        res.send((404), `No curses of ${language} level ${level} were found.`);
-    } else {
-        res.send(JSON.stringify(results));
-    }
-})
 
 
 // Server
